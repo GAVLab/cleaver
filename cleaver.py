@@ -33,6 +33,28 @@ class Force:
         self.time = 0.
         self.step = step
 
+    def header(self):
+        return 'force -freeze /sig_in'
+
+    def epoch(self, sample_value):
+        if sample_value == '\x01':
+            # 1
+            sign_mag = '00'
+        elif sample_value == '\x03':
+            # 3
+            sign_mag = '01'
+        elif sample_value == '\xff':
+            # -1
+            sign_mag = '10'
+        elif sample_value == '\xfd':
+            # -3
+            sign_mag = '11'
+        else:
+            print 'invalid sample value:', sample_value, binascii.hexlify(sample_value)
+        t = round(self.time, 1).__str__()
+        self.time += self.step
+        return sign_mag + ' ' + t + 'ns'
+
     def force_line(self, sample_value):
         if sample_value == '\x01':
             # 1
@@ -77,8 +99,12 @@ else:
             samples = int(num*IF_RATE)
             outfile = open("force_" + sys.argv[1].split('/')[-1], 'w')
             print 'cleaving', samples, 'samples'
+            outfile.write(force.header())
             for byte in xrange(samples):
-                outfile.write(force.force_line(infile.read(1)) + '\n')
+                outfile.write(' ' + force.epoch(infile.read(1)))
+                if byte != samples-1:
+                    outfile.write(',')
+                #outfile.write(force.force_line(infile.read(1)) + '\n')
         else:
             samples = int(num*IF_RATE)
             outfile = open(str(int(num)) + sys.argv[1].split('/')[-1], 'wb')
