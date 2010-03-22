@@ -7,6 +7,25 @@ import binascii
 
 IF_RATE = 16.3676e6
 
+def get_sign_mag(sample_value):
+    if sample_value == '\x01':
+        # 1
+        sign_mag = '00'
+    elif sample_value == '\x03':
+        # 3
+        sign_mag = '01'
+    elif sample_value == '\xff':
+        # -1
+        sign_mag = '10'
+    elif sample_value == '\xfd':
+        # -3
+        sign_mag = '11'
+    else:
+        print 'invalid sample value:', sample_value, binascii.hexlify(sample_value)
+        return None
+    return sign_mag
+ 
+
 def get_sample(sample_value):
     if sample_value == '\x01':
         sign_mag = 0
@@ -56,6 +75,7 @@ if len(sys.argv) < 3:
     print 'use: cleaver.py file seconds [options]'
     print 'options: -p = packed'
     print '         -f = force file'
+    print '         -d = sign and magnitude data'
 elif not os.path.isfile(sys.argv[1]):
     print 'not a valid file'
 else:
@@ -79,6 +99,12 @@ else:
             print 'cleaving', samples, 'samples'
             for byte in xrange(samples):
                 outfile.write(force.force_line(infile.read(1)) + '\n')
+        elif '-d' in sys.argv:
+            samples = int(num*IF_RATE)
+            outlife = open("signmag_" + sys.argv[1].split('/')[-1], 'w')
+            print 'cleaving', samples, 'samples'
+            for byte in xrange(samples):
+                outfile.write(get_sign_mag(infile.read(1)) + '\n')
         else:
             samples = int(num*IF_RATE)
             outfile = open(str(int(num)) + sys.argv[1].split('/')[-1], 'wb')
