@@ -127,7 +127,7 @@ else:
                 #outfile.write(force.force_line(infile.read(1)) + '\n')
         elif '-d' in sys.argv:
             samples = int(num*IF_RATE)
-            outlife = open("signmag_" + sys.argv[1].split('/')[-1], 'w')
+            outfile = open("signmag_" + sys.argv[1].split('/')[-1], 'w')
             print 'cleaving', samples, 'samples'
             for byte in xrange(samples):
                 outfile.write(get_sign_mag(infile.read(1)) + '\n')
