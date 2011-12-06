@@ -1,0 +1,1 @@
+cleaver.py is a utility for cutting large binary files into smaller pieces.  This is particularly useful for raw GPS intermediate frequency (IF) files produced by front-ends such as the NordNav.
